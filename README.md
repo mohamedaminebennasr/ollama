@@ -49,11 +49,7 @@ python process_docs.py
 
 #Test via CLI using:
 
-curl -X 'POST' \
-  'http://localhost:8000/ask' \
-  -H 'Content-Type: application/json' \
-  -d '{"query": "How do I configure Device X for LTE?"}'
-
+curl -X 'POST' 'http://localhost:8000/ask' -H 'Content-Type: application/json' -d '{"query": "How do I configure Device X for LTE?"}'
 
 #To have a UI from where you will ask your model
 
