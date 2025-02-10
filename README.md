@@ -17,11 +17,11 @@ python3 -m venv myenv
 
 source myenv/bin/activate
 
-#install native ollama
+#Install native ollama
 
 curl -fsSL https://ollama.com/install.sh | sh
 
-#install open-webui docker
+#Install open-webui docker
 
 docker stop open-webui
 
@@ -47,7 +47,7 @@ uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
 python process_docs.py
 
-#Test vi CLI using:
+#Test via CLI using:
 
 curl -X 'POST' \
   'http://localhost:8000/ask' \
@@ -55,7 +55,7 @@ curl -X 'POST' \
   -d '{"query": "How do I configure Device X for LTE?"}'
 
 
-#To have a user interface from where you will ask your model
+#To have a UI from where you will ask your model
 
 pip install streamlit
 
