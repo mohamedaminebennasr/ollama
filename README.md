@@ -1,8 +1,17 @@
+This repository has 3 files:
+
+1- app.py: Backend using FastAPI
+
+2- process_docs.py: to index your documentation (RAG pipeline)
+
+3- query_ui.py: UI that will send the command to the backend
+
 sudo apt update
 
 sudo apt install python3 python3-venv python3-pip -y
 
 #create separate python venv
+
 python3 -m venv myenv
 
 source myenv/bin/activate
@@ -23,11 +32,11 @@ sudo docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v 
 
 #Intall this package to be able to implemente your python script
 
-#install deepseek-r1 by using the UI open-webui
-
 pip install ollama langchain chromadb pdfminer.six fastapi uvicorn sentence-transformers
 
-# to start your backed app.py
+#Install deepseek-r1 by using the UI open-webui
+
+# To start your backed app.py
 
 uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
@@ -35,13 +44,15 @@ uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
 python process_docs.py
 
+#Test vi CLI using:
+
 curl -X 'POST' \
   'http://localhost:8000/ask' \
   -H 'Content-Type: application/json' \
   -d '{"query": "How do I configure Device X for LTE?"}'
 
 
-#to have a user interface
+#To have a user interface from where you will ask your model
 
 pip install streamlit
 
