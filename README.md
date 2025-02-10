@@ -1,3 +1,4 @@
+
 This repository has 3 files:
 
 1- app.py: Backend using FastAPI
@@ -26,9 +27,11 @@ docker stop open-webui
 
 docker rm open-webui
 
+rm -rf ~/.open-webui  # ⚠️ WARNING: This resets Open WebUI's settings!
+
 sudo docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 
-#note: you need to point to ollma 127.0.0.1:11436 in open-webui
+#Note: you need to point to ollama 127.0.0.1:11434 in open-webui (open Settings->...)
 
 #Intall this package to be able to implemente your python script
 
