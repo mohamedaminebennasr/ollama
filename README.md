@@ -27,6 +27,8 @@ sudo docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v 
 
 pip install ollama langchain chromadb pdfminer.six fastapi uvicorn sentence-transformers
 
+# to start your backed app.py
+
 uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
 #Run the script to index documents:
@@ -46,6 +48,7 @@ pip install streamlit
 streamlit run query_ui.py
 
 
+# You can launch your UI using Streamlit (`query_ui.py`). From this interface, you can send requests to the backend (`app.py`), which will then trigger the Ollama chat using the DeepSeek-R1 model.
 
 
 
