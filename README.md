@@ -39,7 +39,7 @@ pip install ollama langchain chromadb pdfminer.six fastapi uvicorn sentence-tran
 
 #Install deepseek-r1 by using the UI open-webui
 
-# To start your backed app.py
+#To start your backend app.py
 
 uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
@@ -61,8 +61,9 @@ pip install streamlit
 
 streamlit run query_ui.py
 
+#You can launch your UI using Streamlit (`query_ui.py`). From this interface, you can send requests to the backend (`app.py`), which will then trigger the Ollama chat using the DeepSeek-R1 model.
 
-# You can launch your UI using Streamlit (`query_ui.py`). From this interface, you can send requests to the backend (`app.py`), which will then trigger the Ollama chat using the DeepSeek-R1 model.
+
 
 
 
