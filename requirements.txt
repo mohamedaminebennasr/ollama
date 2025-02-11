@@ -8,3 +8,7 @@ langchain==0.3.18
 langchain-ollama==0.2.3
 streamlit==1.42.0
 requests==2.32.3
+#for Real-Time Document Indexing add this package otherwise no need
+#watchdog
+#python-pptx
+#python-docx
