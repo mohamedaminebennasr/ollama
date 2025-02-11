@@ -7,6 +7,12 @@ This repository has 3 files:
 
 3- query_ui.py: Frontend using streamlit. The UI created will be used to send the command to the backend
 
+#Note: Why installing ollama package in python and also ollama natively using curl -fsSL https://ollama.com/install.sh | sh?
+
+#The Python package ollama (which you already have in requirements.txt) only provides a client to communicate with the Ollama runtime.
+#The actual Ollama engine (native one) needs to be installed separately to run models like deepseek-r1.
+#Without installing the Ollama runtime, your application won't be able to load or run DeepSeek models.
+
 sudo apt update
 
 sudo apt install python3 python3-venv python3-pip -y
