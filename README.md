@@ -5,7 +5,7 @@ This repository has 3 files:
 
 2- process_docs.py: to index your documentation (RAG pipeline)
 
-3- query_ui.py: UI that will send the command to the backend
+3- query_ui.py: Frontend using streamlit. The UI created will be used to send the command to the backend
 
 sudo apt update
 
