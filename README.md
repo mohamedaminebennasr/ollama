@@ -125,6 +125,77 @@ streamlit run query_ui.py
 #logging.basicConfig(level=logging.INFO)
 #Monitor with Prometheus/Grafana for real-time insights.
 
+#Gunicorn: Production ASGI Server for FastAPI
+#Gunicorn (Green Unicorn) is a Python WSGI/ASGI HTTP Server used to serve FastAPI applications efficiently in production environments. While uvicorn is great for development, Gunicorn adds:
+#
+#Process management (spawning multiple workers for better performance)
+#Stability (automatic restarts, graceful shutdowns)
+#Scalability (handles multiple requests concurrently)
+#Why Use Gunicorn with FastAPI?
+#Performance: Gunicorn can run multiple worker processes, handling more requests in parallel.
+#Reliability: If one worker crashes, Gunicorn will restart it.
+#Production-ready: Many cloud services and servers (like Nginx, Kubernetes, AWS, and Docker) support Gunicorn for deployment.
+#How to Install Gunicorn
+#Since Gunicorn is not in your requirements.txt, add it manually:
+#
+#bash
+#Copy
+#Edit
+#pip install gunicorn
+#Or update your requirements.txt:
+#
+#plaintext
+#Copy
+#Edit
+#gunicorn
+#Running FastAPI with Gunicorn
+#To serve your FastAPI app (app.py) efficiently, use:
+#
+#bash
+#Copy
+#Edit
+#gunicorn -w 4 -k uvicorn.workers.UvicornWorker app:app
+#Breakdown of the Command:
+#gunicorn → Starts Gunicorn.
+#-w 4 → Runs 4 worker processes (adjust based on CPU cores).
+#-k uvicorn.workers.UvicornWorker → Uses Uvicorn as an ASGI worker to serve FastAPI.
+#app:app → app.py file, app is the FastAPI instance.
+#Advanced Gunicorn Configurations
+#Run on Specific Port
+#
+#bash
+#Copy
+#Edit
+#gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 app:app
+#Run in the Background (Daemon Mode)
+#
+#bash
+#Copy
+#Edit
+#gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 app:app --daemon
+#Auto-restart on Changes (for Development)
+#
+#bash
+#Copy
+#Edit
+#gunicorn -w 4 -k uvicorn.workers.UvicornWorker --reload app:app
+#Logging & Timeout Handling
+#
+#bash
+#Copy
+#Edit
+#gunicorn -w 4 -k uvicorn.workers.UvicornWorker --timeout 120 --log-level info app:app
+#Using Gunicorn with Docker
+#If you deploy your app with Docker, use this Dockerfile:
+#
+#dockerfile
+#Copy
+#Edit
+#FROM python:3.10
+#WORKDIR /app
+#COPY . .
+#RUN pip install --no-cache-dir -r requirements.txt
+#CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "app:app"]
 
 
 
