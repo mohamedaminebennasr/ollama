@@ -70,6 +70,62 @@ streamlit run query_ui.py
 #You can launch your UI using Streamlit (`query_ui.py`). From this interface, you can send requests to the backend (`app.py`), which will then trigger the Ollama chat using the DeepSeek-R1 model.
 
 
+#Potential Enhancement
+
+#1. Infrastructure Considerations
+#Deploy FastAPI with Uvicorn + Gunicorn for scalability:
+#bash
+#Copy
+#Edit
+#pip install gunicorn
+#Then, run:
+#bash
+#Copy
+#Edit
+#gunicorn -w 4 -k uvicorn.workers.UvicornWorker app:app
+#Use a persistent database for document storage instead of ChromaDB if needed.
+#2. Security Enhancements
+#Enable CORS in FastAPI if accessed from different frontends:
+#python
+#Copy
+#Edit
+#from fastapi.middleware.cors import CORSMiddleware
+#
+#app.add_middleware(
+#    CORSMiddleware,
+#    allow_origins=["*"],  # Adjust as needed
+#    allow_credentials=True,
+#    allow_methods=["*"],
+#    allow_headers=["*"],
+#)
+#Limit API access with authentication (e.g., API keys, OAuth).
+#3. Handling Large-Scale Data
+#Optimize ChromaDB indexing:
+#Increase memory allocation
+#Fine-tune retrieval parameters (n_results)
+#Chunk larger documents efficiently to improve retrieval performance.
+#4. Deployment & Automation
+#Run as a service (Systemd, Docker, or Kubernetes):
+#Dockerize for consistent deployments:
+#dockerfile
+#Copy
+#Edit
+#FROM python:3.10
+#WORKDIR /app
+#COPY . .
+#RUN pip install --no-cache-dir -r requirements.txt
+#CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+#Use CI/CD to automate updates.
+#5. Monitoring & Logging
+#Enable logging for API requests:
+#python
+#Copy
+#Edit
+#import logging
+#logging.basicConfig(level=logging.INFO)
+#Monitor with Prometheus/Grafana for real-time insights.
+
+
 
 
 
