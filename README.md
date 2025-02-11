@@ -35,7 +35,9 @@ sudo docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v 
 
 #Intall this package to be able to implement your python script
 
-pip install ollama langchain chromadb pdfminer.six fastapi uvicorn sentence-transformers
+#pip install ollama langchain chromadb pdfminer.six fastapi uvicorn sentence-transformers
+
+#pip install -r requirements.txt
 
 #Install deepseek-r1 by using the UI open-webui or vi CLI: ollama pull deepseek-r1 and in this case you don't need open-webui
 
