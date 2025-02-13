@@ -25,7 +25,8 @@ async def ask_device_question(request: QueryRequest):
 
     # Send query to DeepSeek via Ollama
     response = ollama.chat(
-    model="deepseek-r1",
+    #model="deepseek-r1",
+    model="mistral", #7b parameter model
     #temperature=0.3,  # Reduce randomness
     messages=[
         {"role": "system", "content": "You are an AI specialized in answering questions based on technical documents. Provide short, precise, and well-structured answers. Do NOT provide unnecessary reasoning."},
