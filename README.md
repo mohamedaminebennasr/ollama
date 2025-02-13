@@ -83,11 +83,11 @@ streamlit run query_ui.py
 #from fastapi.middleware.cors import CORSMiddleware
 #
 #app.add_middleware(
-#    CORSMiddleware,
-#    allow_origins=["*"],  # Adjust as needed
-#    allow_credentials=True,
-#    allow_methods=["*"],
-#    allow_headers=["*"],
+#CORSMiddleware,
+#allow_origins=["*"],  # Adjust as needed
+#allow_credentials=True,
+#allow_methods=["*"],
+#allow_headers=["*"],
 #)
 #Limit API access with authentication (e.g., API keys, OAuth).
 #3. Handling Large-Scale Data
