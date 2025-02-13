@@ -73,22 +73,13 @@ streamlit run query_ui.py
 #Potential Enhancement
 
 #1. Infrastructure Considerations
+
 #Deploy FastAPI with Uvicorn + Gunicorn for scalability:
-#bash
-#Copy
-#Edit
 #pip install gunicorn
-#Then, run:
-#bash
-#Copy
-#Edit
 #gunicorn -w 4 -k uvicorn.workers.UvicornWorker app:app
 #Use a persistent database for document storage instead of ChromaDB if needed.
 #2. Security Enhancements
 #Enable CORS in FastAPI if accessed from different frontends:
-#python
-#Copy
-#Edit
 #from fastapi.middleware.cors import CORSMiddleware
 #
 #app.add_middleware(
@@ -107,9 +98,6 @@ streamlit run query_ui.py
 #4. Deployment & Automation
 #Run as a service (Systemd, Docker, or Kubernetes):
 #Dockerize for consistent deployments:
-#dockerfile
-#Copy
-#Edit
 #FROM python:3.10
 #WORKDIR /app
 #COPY . .
@@ -118,9 +106,6 @@ streamlit run query_ui.py
 #Use CI/CD to automate updates.
 #5. Monitoring & Logging
 #Enable logging for API requests:
-#python
-#Copy
-#Edit
 #import logging
 #logging.basicConfig(level=logging.INFO)
 #Monitor with Prometheus/Grafana for real-time insights.
@@ -137,23 +122,10 @@ streamlit run query_ui.py
 #Production-ready: Many cloud services and servers (like Nginx, Kubernetes, AWS, and Docker) support Gunicorn for deployment.
 #How to Install Gunicorn
 #Since Gunicorn is not in your requirements.txt, add it manually:
-#
-#bash
-#Copy
-#Edit
 #pip install gunicorn
 #Or update your requirements.txt:
-#
-#plaintext
-#Copy
-#Edit
-#gunicorn
 #Running FastAPI with Gunicorn
 #To serve your FastAPI app (app.py) efficiently, use:
-#
-#bash
-#Copy
-#Edit
 #gunicorn -w 4 -k uvicorn.workers.UvicornWorker app:app
 #Breakdown of the Command:
 #gunicorn → Starts Gunicorn.
@@ -162,35 +134,15 @@ streamlit run query_ui.py
 #app:app → app.py file, app is the FastAPI instance.
 #Advanced Gunicorn Configurations
 #Run on Specific Port
-#
-#bash
-#Copy
-#Edit
 #gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 app:app
 #Run in the Background (Daemon Mode)
-#
-#bash
-#Copy
-#Edit
 #gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000 app:app --daemon
 #Auto-restart on Changes (for Development)
-#
-#bash
-#Copy
-#Edit
 #gunicorn -w 4 -k uvicorn.workers.UvicornWorker --reload app:app
 #Logging & Timeout Handling
-#
-#bash
-#Copy
-#Edit
 #gunicorn -w 4 -k uvicorn.workers.UvicornWorker --timeout 120 --log-level info app:app
 #Using Gunicorn with Docker
 #If you deploy your app with Docker, use this Dockerfile:
-#
-#dockerfile
-#Copy
-#Edit
 #FROM python:3.10
 #WORKDIR /app
 #COPY . .
