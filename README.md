@@ -1,11 +1,11 @@
 
-This repository has 3 files:
+#This repository has 3 files:
 
-1- app.py: Backend using FastAPI
+#1- app.py: Backend using FastAPI
 
-2- process_docs.py: to index your documentation (RAG pipeline)
+#2- process_docs.py: to index your documentation (RAG pipeline)
 
-3- query_ui.py: Frontend using streamlit. The UI created will be used to send the command to the backend
+#3- query_ui.py: Frontend using streamlit. The UI created will be used to send the command to the backend
 
 #Note: Why installing ollama package in python and also ollama natively using curl -fsSL https://ollama.com/install.sh | sh?
 
