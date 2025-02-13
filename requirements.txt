@@ -12,3 +12,7 @@ requests==2.32.3
 #watchdog
 #python-pptx
 #python-docx
+#pytesseract
+#pillow
+#openpyxl
+#pandas
