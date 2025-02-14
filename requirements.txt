@@ -17,4 +17,6 @@ requests==2.32.3
 #openpyxl
 #pandas
 #zipfile36
+#kafka-python
+#qdrant_client
 
