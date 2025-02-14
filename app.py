@@ -1,15 +1,13 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-import chromadb
 import ollama
+from qdrant_client import QdrantClient
+from qdrant_client.models import Filter
 
 app = FastAPI()
 
-# Load ChromaDB
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
-collection = chroma_client.get_collection(name="device_docs")
+qdrant = QdrantClient(url="http://localhost:6333")
 
-# Define a Pydantic model for the request body
 class QueryRequest(BaseModel):
     query: str
 
@@ -17,22 +15,23 @@ class QueryRequest(BaseModel):
 async def ask_device_question(request: QueryRequest):
     query_text = request.query
 
-    # Retrieve relevant document snippets
-    results = collection.query(query_texts=[query_text], n_results=3)
+    # Search for relevant documents in Qdrant
+    search_results = qdrant.search(
+        collection_name="iot_docs",
+        query_vector=[0.1] * 512,
+        limit=3
+    )
 
-    # Extract retrieved content correctly
-    retrieved_text = "\n\n".join(sum(results["documents"], []))  # Flatten list of lists
+    retrieved_text = "\n\n".join([doc.payload["text"] for doc in search_results])
 
-    # Send query to DeepSeek via Ollama
+    # AI model generates an answer
     response = ollama.chat(
-    #model="deepseek-r1",
-    model="mistral", #7b parameter model
-    #temperature=0.3,  # Reduce randomness
-    messages=[
-        {"role": "system", "content": "You are an AI specialized in answering questions based on technical documents. Provide short, precise, and well-structured answers. Do NOT provide unnecessary reasoning."},
-        {"role": "user", "content": f"Docs:\n{retrieved_text}\n\nQuestion: {query_text}\n\nAnswer concisely and directly."}
-    ]
-)
-
+        #model="deepseek-r1",
+        model="mistral", #7b parameter model
+        messages=[
+            {"role": "system", "content": "Answer user questions based on provided documentation."},
+            {"role": "user", "content": f"Docs:\n{retrieved_text}\n\nQuestion: {query_text}"}
+        ]
+    )
 
     return {"answer": response["message"]["content"]}
