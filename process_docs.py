@@ -1,151 +1,100 @@
+from kafka import KafkaProducer
+import json
 import os
-import time
-import zipfile
+from kafka import KafkaConsumer
+import json
+import requests
 import pdfminer.high_level
-import pytesseract
 from PIL import Image
+import pytesseract
+import docx
 import pandas as pd
-from pdfminer.pdfdocument import PDFNoValidXRef
-from pdfminer.psparser import PSEOF
-from langchain_ollama import OllamaEmbeddings
-import chromadb
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+from qdrant_client import QdrantClient
+from qdrant_client.models import PointStruct
+import hashlib
 
-# Directory where documents are stored
+KAFKA_BROKER = "localhost:9092"
+TOPIC = "document-uploads"
+
+consumer = KafkaConsumer(
+    TOPIC,
+    bootstrap_servers=KAFKA_BROKER,
+    value_deserializer=lambda x: json.loads(x.decode("utf-8"))
+)
+
+producer = KafkaProducer(
+    bootstrap_servers=KAFKA_BROKER,
+    value_serializer=lambda v: json.dumps(v).encode("utf-8")
+)
+
 DOCUMENTS_DIR = "/home/ai-bench/Documents"
 
-# Initialize ChromaDB
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
-collection = chroma_client.get_or_create_collection(name="device_docs")
-
-# Load embedding model
-embedding_model = OllamaEmbeddings(model="deepseek-r1")
-
-# Allowed file types
-SUPPORTED_FILE_TYPES = {".pdf", ".jpg", ".jpeg", ".png", ".tiff", ".xlsx", ".xls", ".txt", ".zip"}
-
-# Function to extract ZIP files (Prevents Infinite Recursion)
-def extract_zip(zip_path, extract_to):
-    extracted_folder = os.path.join(extract_to, os.path.basename(zip_path).replace(".zip", ""))
-    
-    # Check if already extracted to avoid infinite recursion
-    if os.path.exists(extracted_folder):
-        print(f"🔹 Skipping already extracted ZIP: {zip_path}")
-        return extracted_folder
-
-    try:
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(extracted_folder)
-        print(f"✅ Extracted: {zip_path} to {extracted_folder}")
-        return extracted_folder
-    except Exception as e:
-        print(f"⚠️ Error extracting ZIP file {zip_path}: {e}")
-        return None
-
-# OCR: Extract text from images
-def extract_text_from_image(image_path):
-    try:
-        image = Image.open(image_path)
-        return pytesseract.image_to_string(image)
-    except Exception as e:
-        print(f"⚠️ Error extracting text from image {image_path}: {e}")
-        return ""
-
-# Extract text from PDFs (handles corrupt PDFs)
-def extract_text_from_pdf(pdf_path):
-    try:
-        return pdfminer.high_level.extract_text(pdf_path)
-    except (PDFNoValidXRef, PSEOF):
-        print(f"⚠️ Warning: Skipping corrupt PDF {pdf_path}")
-        return ""
-    except Exception as e:
-        print(f"⚠️ Error processing PDF {pdf_path}: {e}")
-        return ""
-
-# Extract text from Excel files
-def extract_text_from_xlsx(xlsx_path):
-    try:
-        df = pd.read_excel(xlsx_path, engine="openpyxl")
-        return "\n".join(df.astype(str).apply(lambda x: " | ".join(x), axis=1))
-    except Exception as e:
-        print(f"⚠️ Error extracting text from Excel file {xlsx_path}: {e}")
-        return ""
-
-# Extract text from text files
-def extract_text_from_txt(txt_path):
-    try:
-        with open(txt_path, "r", encoding="utf-8") as f:
-            return f.read()
-    except Exception as e:
-        print(f"⚠️ Error extracting text from TXT file {txt_path}: {e}")
-        return ""
-
-# Process a directory (recursive search but avoids infinite loops)
-def process_directory(directory):
-    for root, _, files in os.walk(directory):  # Recursively iterate through directories
+# Scan and send new document events to Kafka
+def send_new_documents():
+    for root, _, files in os.walk(DOCUMENTS_DIR):
         for file in files:
             file_path = os.path.join(root, file)
-            process_document(file_path)  # Process each file
+            ext = os.path.splitext(file)[-1].lower()
+            if ext in [".pdf", ".docx", ".txt", ".png", ".jpg", ".xlsx"]:
+                event_data = {"file_path": file_path, "file_name": file}
+                producer.send(TOPIC, event_data)
+                print(f"📤 Sent to Kafka: {file}")
 
-# Process a new document
-def process_document(file_path):
-    _, ext = os.path.splitext(file_path)
+# Connect to Qdrant for vector search
+qdrant = QdrantClient(url="http://localhost:6333")
 
-    # Skip unsupported file types
-    if ext.lower() not in SUPPORTED_FILE_TYPES:
-        print(f"⚠️ Skipping unsupported file: {file_path}")
-        return
+# Function to extract text from PDFs
+def extract_text_from_pdf(file_path):
+    return pdfminer.high_level.extract_text(file_path)
+
+# Function to extract text from images using OCR
+def extract_text_from_image(file_path):
+    image = Image.open(file_path)
+    return pytesseract.image_to_string(image)
+
+# Function to extract text from Word documents
+def extract_text_from_docx(file_path):
+    doc = docx.Document(file_path)
+    return "\n".join([p.text for p in doc.paragraphs])
+
+# Function to extract text from Excel files
+def extract_text_from_xlsx(file_path):
+    df = pd.read_excel(file_path, engine="openpyxl")
+    return "\n".join(df.astype(str).apply(lambda x: " | ".join(x), axis=1))
+
+# Process incoming documents from Kafka
+for message in consumer:
+    file_data = message.value
+    file_path = file_data["file_path"]
+    file_name = file_data["file_name"]
 
     text = ""
+    ext = os.path.splitext(file_name)[-1].lower()
 
-    if ext == ".zip":
-        extracted_folder = extract_zip(file_path, os.path.dirname(file_path))
-        if extracted_folder:
-            process_directory(extracted_folder)  # Process extracted files
-        return  # Skip indexing ZIP itself
-
-    elif ext == ".pdf":
+    if ext == ".pdf":
         text = extract_text_from_pdf(file_path)
-    elif ext in [".jpg", ".jpeg", ".png", ".tiff"]:
+    elif ext in [".jpg", ".png"]:
         text = extract_text_from_image(file_path)
-    elif ext in [".xlsx", ".xls"]:
+    elif ext == ".docx":
+        text = extract_text_from_docx(file_path)
+    elif ext == ".xlsx":
         text = extract_text_from_xlsx(file_path)
     elif ext == ".txt":
-        text = extract_text_from_txt(file_path)
+        with open(file_path, "r", encoding="utf-8") as f:
+            text = f.read()
 
     if text.strip():
-        chunks = [text[i:i+500] for i in range(0, len(text), 500)]
-        collection.add(
-            documents=chunks,
-            metadatas=[{"source": os.path.basename(file_path)}] * len(chunks),
-            ids=[f"{os.path.basename(file_path)}-{i}" for i in range(len(chunks))]
-        )
-        print(f"✅ Indexed: {file_path}")
-    else:
-        print(f"⚠️ Skipped empty document: {file_path}")
+        # Generate document ID
+        doc_id = hashlib.sha256(file_name.encode()).hexdigest()
 
-# Watch for new files and index them (real-time monitoring)
-class DocumentHandler(FileSystemEventHandler):
-    def on_created(self, event):
-        if not event.is_directory:
-            process_document(event.src_path)
+        # Store document text embeddings in Qdrant
+        qdrant.upsert(
+            collection_name="iot_docs",
+            points=[
+                PointStruct(id=doc_id, vector=[0.1] * 512, payload={"text": text, "filename": file_name})
+            ]
+        )
+        print(f"✅ Indexed: {file_name}")
 
 if __name__ == "__main__":
-    # Process all existing files at startup
-    print(f"📢 Scanning {DOCUMENTS_DIR} for existing documents...")
-    process_directory(DOCUMENTS_DIR)
-
-    # Start watchdog for live monitoring
-    event_handler = DocumentHandler()
-    observer = Observer()
-    observer.schedule(event_handler, DOCUMENTS_DIR, recursive=True)
-    observer.start()
-
-    print(f"📢 Watching {DOCUMENTS_DIR} for new documents...")
-    try:
-        while True:
-            time.sleep(5)
-    except KeyboardInterrupt:
-        observer.stop()
-    observer.join()
+    send_new_documents()
