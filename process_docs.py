@@ -13,6 +13,10 @@ import hashlib
 import uuid  # Import UUID library
 from qdrant_client.models import Distance, VectorParams
 from kafka.admin import KafkaAdminClient
+from langchain_ollama import OllamaEmbeddings
+	
+import os
+import hashlib
 
 # Kafka Configuration
 KAFKA_BROKER = "localhost:9092"
@@ -126,7 +130,39 @@ def ensure_qdrant_collection():
     else:
         print(f"✅ Collection '{collection_name}' already exists.")
 
+#Delete Only the Stored Vectors Without Removing the Collection
+def clear_qdrant_documents():
+    """Deletes all indexed documents in the Qdrant collection without removing the structure."""
+    collection_name = "iot_docs"
 
+    try:
+        # ✅ Correct method to delete all points in Qdrant
+        qdrant.delete(collection_name=collection_name, points_selector=[])
+
+        print(f"🗑️ All documents removed from Qdrant collection '{collection_name}'.")
+    except Exception as e:
+        print(f"❌ Error clearing Qdrant collection: {e}")
+
+#Delete the Whole Collection
+def reset_qdrant_collection():
+    """Deletes and recreates the Qdrant collection to clear all old data."""
+    collection_name = "iot_docs"
+
+    try:
+        qdrant.delete_collection(collection_name)
+        print(f"🗑️ Collection '{collection_name}' deleted.")
+
+        # ✅ Recreate the collection
+        qdrant.create_collection(
+            collection_name=collection_name,
+            vectors_config={"size": 4096, "distance": "Cosine"}
+        )
+        print(f"✅ Collection '{collection_name}' recreated.")
+
+    except Exception as e:
+        print(f"❌ Error resetting Qdrant collection: {e}")
+
+        
 # Reset Kafka Consumer Offsets
 def reset_consumer_offsets():
     print("🔄 Resetting Kafka consumer offsets...")
@@ -138,33 +174,44 @@ def reset_consumer_offsets():
         print(f"❌ Error resetting Kafka consumer offsets: {e}")
 
 
+# ✅ Initialize Ollama Embeddings
+embedding_model = OllamaEmbeddings(model="mistral")  # Change model as needed	
 
+def generate_document_vector(text):
+    """Convert document text into an embedding using Ollama."""
+    return embedding_model.embed_query(text)
+    
 def process_documents():
+  
     print("🟢 Listening for new documents from Kafka...")
 
-    # Ensure Qdrant collection exists
+    # ✅ Ensure Qdrant collection exists
     ensure_qdrant_collection()
 
     while True:
         try:
             for message in consumer:
                 file_data = message.value
-                print(f"📥 Received Kafka message: {file_data['file_name']}")  # Only file name
+                print(f"📥 Received Kafka message: {file_data['file_name']}")
 
                 file_path = file_data["file_path"]
                 file_name = file_data["file_name"]
 
                 ext = os.path.splitext(file_name)[-1].lower()
                 text = extract_text(file_path, ext, file_name)
-                if text.strip():
-                    doc_id = str(uuid.uuid4())  # Use UUIDs for Qdrant compatibility
 
-                    # Store extracted text in Qdrant
+                if text.strip():
+                    doc_id = str(uuid.uuid4())  # Use UUIDs for unique document IDs
+
+                    # ✅ Generate embedding using Ollama
+                    vector = generate_document_vector(text)
+
+                    # ✅ Store in Qdrant with real embeddings
                     print(f"🚀 Storing in Qdrant: {file_name}")
                     qdrant.upsert(
                         collection_name="iot_docs",
                         points=[
-                            PointStruct(id=doc_id, vector=[0.1] * 512, payload={"text": text, "filename": file_name})
+                            PointStruct(id=doc_id, vector=vector, payload={"text": text, "filename": file_name})
                         ]
                     )
                     print(f"✅ Indexed: {file_name}")
@@ -175,7 +222,6 @@ def process_documents():
             print(f"❌ Kafka consumer error: {e}")
             print("🔄 Restarting consumer in 5 seconds...")
             time.sleep(5)  # Wait before restarting the loop
-            
 
 # Run producer and consumer separately in the main execution flow
 if __name__ == "__main__":
@@ -186,6 +232,9 @@ if __name__ == "__main__":
     from multiprocessing import Process
     producer_process = Process(target=send_new_documents, daemon=True)
     producer_process.start()
-
+    
+    #Delete Only the Stored Vectors Without Removing the Collection
+    #clear_qdrant_documents()
+    reset_qdrant_collection()
     # Run Kafka consumer in the main thread
     process_documents()
