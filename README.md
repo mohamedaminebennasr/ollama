@@ -69,7 +69,8 @@ streamlit run query_ui.py
 
 #You can launch your UI using Streamlit (`query_ui.py`). From this interface, you can send requests to the backend (`app.py`), which will then trigger the Ollama chat using the DeepSeek-R1 model.
 
-
+#bin/zookeeper-server-start.sh config/zookeeper.properties &
+#bin/kafka-server-start.sh config/server.properties &
 #Potential Enhancement
 
 #1. Infrastructure Considerations
