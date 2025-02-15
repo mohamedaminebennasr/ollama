@@ -14,6 +14,7 @@
 #Without installing the Ollama runtime, your application won't be able to load or run DeepSeek models.
 
 sudo apt update
+sudo apt update && sudo apt install -y tesseract-ocr
 
 sudo apt install python3 python3-venv python3-pip -y
 
