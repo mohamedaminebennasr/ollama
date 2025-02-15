@@ -35,6 +35,8 @@ st.markdown(
         margin-top: 20px;
         box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
         width: 100%;
+        word-wrap: break-word;
+        white-space: pre-wrap;
     }
     .copy-button {
         background-color: #6366F1;
@@ -93,13 +95,17 @@ with col2:
                 except requests.exceptions.RequestException:
                     answer = "⚠️ Error: Could not connect to the AI service."
 
-            # Full-width response container
+            # Display AI response in a structured container
             st.markdown('<p class="title-text">📌 AI Response:</p>', unsafe_allow_html=True)
             st.markdown(f'<div class="response-container">{answer}</div>', unsafe_allow_html=True)
 
-            # Copy Button
+            # Copy Button using JavaScript
             st.markdown(
-                f'<button class="copy-button" onclick="navigator.clipboard.writeText(`{answer}`)">📋 Copy</button>',
+                f"""
+                <button class="copy-button" onclick="navigator.clipboard.writeText(`{answer}`)">
+                📋 Copy
+                </button>
+                """,
                 unsafe_allow_html=True
             )
 
