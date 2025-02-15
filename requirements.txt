@@ -20,5 +20,6 @@ requests==2.32.3
 #kafka-python
 #qdrant_client
 #pyperclip
+#xclip
 #sudo apt update && sudo apt install -y tesseract-ocr
 
