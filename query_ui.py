@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import pyperclip  # Used for local clipboard operations
 
 # Set full-page layout
 st.set_page_config(page_title="AI Document Query System", layout="wide")
@@ -35,18 +36,6 @@ st.markdown(
         margin-top: 20px;
         box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
         width: 100%;
-        word-wrap: break-word;
-        white-space: pre-wrap;
-    }
-    .copy-button {
-        background-color: #6366F1;
-        color: white;
-        border: none;
-        padding: 8px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        margin-top: 10px;
     }
     .footer {
         position: fixed;
@@ -65,6 +54,10 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+# Initialize session state for storing AI response
+if "latest_answer" not in st.session_state:
+    st.session_state["latest_answer"] = ""
 
 # Header Section
 col1, col2, col3 = st.columns([1, 3, 1])
@@ -91,26 +84,21 @@ with col2:
             with st.spinner("⏳ Processing your request..."):
                 try:
                     response = requests.post("http://localhost:8000/ask", json={"query": query})
-                    answer = response.json().get("answer", "No response received.")
+                    st.session_state["latest_answer"] = response.json().get("answer", "No response received.")
                 except requests.exceptions.RequestException:
-                    answer = "⚠️ Error: Could not connect to the AI service."
+                    st.session_state["latest_answer"] = "⚠️ Error: Could not connect to the AI service."
 
-            # Display AI response in a structured container
-            st.markdown('<p class="title-text">📌 AI Response:</p>', unsafe_allow_html=True)
-            st.markdown(f'<div class="response-container">{answer}</div>', unsafe_allow_html=True)
+# Display AI Response if available
+if st.session_state["latest_answer"]:
+    st.markdown('<p class="title-text">📌 AI Response:</p>', unsafe_allow_html=True)
+    st.markdown(f'<div class="response-container">{st.session_state["latest_answer"]}</div>', unsafe_allow_html=True)
 
-            # Copy Button using JavaScript
-            st.markdown(
-                f"""
-                <button class="copy-button" onclick="navigator.clipboard.writeText(`{answer}`)">
-                📋 Copy
-                </button>
-                """,
-                unsafe_allow_html=True
-            )
-
-        else:
-            st.warning("⚠️ Please enter a valid query.")
+    # Copy Button (Ensures text remains after clicking)
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("📋 Copy", use_container_width=True):
+            pyperclip.copy(st.session_state["latest_answer"])
+            st.success("✅ Answer copied to clipboard!")
 
 st.write("---")  # Divider
 
