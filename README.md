@@ -55,8 +55,51 @@ pip install streamlit
 
 curl -X 'POST' 'http://localhost:8000/ask' -H 'Content-Type: application/json' -d '{"query": "How do I configure Device X for LTE?"}'
 
+#High Level Application design:
 
+                          +------------------------+
+                          |   Query UI (Streamlit) |
+                          +------------+-----------+
+                                       |
+                                       ▼
+                          +----------------------+
+                          |    Query API (FastAPI) |
+                          |  - Generates query vectors |
+                          |  - Queries Qdrant |
+                          +------------+-------------+
+                                       |
+          +----------------------------+-----------------------------+
+          |                                                            |
+          ▼                                                            ▼
++----------------------------+                        +----------------------------+
+|   Qdrant Vector DB         |                        |   Kafka Event Bus           |
+|  - Stores document vectors |                        |  - Decouples ingestion      |
+|  - Supports semantic search|                        |  - Ensures real-time updates|
++----------------------------+                        +----------------------------+
+          ▲                                                            ▲
+          |                                                            |
+          |                                                            |
++----------------------------+                        +----------------------------+
+|   Document Processor       |                        |  Producer (Document Feeder) |
+|  - Extracts & chunks text  |                        |  - Reads & sends files      |
+|  - Generates embeddings    |                        |  - Publishes to Kafka       |
+|  - Deduplicates documents  |                        +----------------------------+
+|  - Indexes in Qdrant       |
++------------+---------------+
+             |
+             ▼
++----------------------------+
+|  Kafka Consumer            |
+|  - Listens for new docs    |
+|  - Extracts & embeds text  |
+|  - Stores in Qdrant        |
++----------------------------+
 
+#Technology Stack
+
+![image](https://github.com/user-attachments/assets/647acf07-115c-4565-b9bd-d7a12500e8ae)
+
+#To start the application after installing the dependencies from the requirements.txt
 #start kafka: should start zookeeper then kafka as per this order
 bin/zookeeper-server-start.sh config/zookeeper.properties &
 bin/kafka-server-start.sh config/server.properties &
