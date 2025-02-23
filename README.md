@@ -44,12 +44,26 @@ sudo docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v 
 
 #pip install ollama langchain chromadb pdfminer.six fastapi uvicorn sentence-transformers
 
+pip install streamlit
 #pip install -r requirements.txt
 
 #Install deepseek-r1 by using the UI open-webui or vi CLI: ollama pull deepseek-r1 and in this case you don't need open-webui
 
-#To start your backend app.py
 
+
+#Test via CLI using:
+
+curl -X 'POST' 'http://localhost:8000/ask' -H 'Content-Type: application/json' -d '{"query": "How do I configure Device X for LTE?"}'
+
+
+
+#start kafka: should start zookeeper then kafka as per this order
+bin/zookeeper-server-start.sh config/zookeeper.properties &
+bin/kafka-server-start.sh config/server.properties &
+#start qdrant
+sudo docker run -d --name qdrant -p 6333:6333 qdrant/qdrant
+
+#To start your backend app.py
 uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
 #Use uvicorn app:app --reload after any modification of app.py if needed.
@@ -57,26 +71,16 @@ uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 #Run the script to index documents:
 
 python process_docs.py
-
-#Test via CLI using:
-
-curl -X 'POST' 'http://localhost:8000/ask' -H 'Content-Type: application/json' -d '{"query": "How do I configure Device X for LTE?"}'
-
 #To have a UI from where you will ask your model
-
-pip install streamlit
 
 streamlit run query_ui.py
 
 #You can launch your UI using Streamlit (`query_ui.py`). From this interface, you can send requests to the backend (`app.py`), which will then trigger the Ollama chat using the DeepSeek-R1 model.
-
-#start kafka: should start zookeeper then kafka as per this order
-#bin/zookeeper-server-start.sh config/zookeeper.properties &
-#bin/kafka-server-start.sh config/server.properties &
-
 #Reset Kafka Consumer Offsets
 #kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-group --reset-offsets --to-earliest --execute --all-topics
 
+
+-------------------------------------------------------------------------------------------------------------------------------------
 #Potential Enhancement
 
 #1. Infrastructure Considerations
