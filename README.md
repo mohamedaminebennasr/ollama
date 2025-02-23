@@ -96,8 +96,32 @@ curl -X 'POST' 'http://localhost:8000/ask' -H 'Content-Type: application/json' -
 +----------------------------+
 
 #Technology Stack
+ToDo
+#Reorganized Folder Structure
+/ai-document-search
+│── /backend
+│   ├── api.py                # FastAPI endpoints
+│   ├── query_service.py       # Query processing logic
+│   ├── ingestion_service.py   # Document processing
+│   ├── vector_store.py        # Qdrant operations
+│   ├── kafka_producer.py      # Kafka document publisher
+│   ├── kafka_consumer.py      # Kafka document consumer
+│── /frontend
+│   ├── ui.py                  # Streamlit UI
+│── /config
+│   ├── settings.py            # App config
+│── /models
+│   ├── embeddings.py          # Embedding generator (Ollama)
+│   ├── text_processing.py     # Chunking & NLP processing
+│── /data
+│   ├── documents/             # Raw & processed documents
+│── /logs
+│   ├── app.log                # System logs
+│── requirements.txt
+│── Dockerfile                 # Docker setup
+│── README.md
 
-![image](https://github.com/user-attachments/assets/647acf07-115c-4565-b9bd-d7a12500e8ae)
+
 
 #To start the application after installing the dependencies from the requirements.txt
 #start kafka: should start zookeeper then kafka as per this order
