@@ -26,15 +26,16 @@ curl -fsSL https://ollama.com/install.sh | sh
 sudo docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 
 **Note:** Below commands are optional:
+
 stop: docker stop open-webui
 delete: docker rm open-webui
-delete forced: rm -rf ~/.open-webui  # ⚠️ WARNING: This resets Open WebUI's settings!
+delete forced: rm -rf ~/.open-webui  **Note:**⚠️ WARNING: This resets Open WebUI's settings!
 
-#Note: you need to point to ollama 127.0.0.1:11434 in open-webui (open Settings->...)
+**Note:** you need to point to ollama 127.0.0.1:11434 in open-webui (open Settings->...)
 
-#Intall this package to be able to implement your python script
+Intall this package to be able to implement your python script
 
-#pip install -r requirements.txt
+pip install -r requirements.txt
 
 #Install deepseek-r1 by using the UI open-webui or vi CLI: ollama pull deepseek-r1 and in this case you don't need open-webui
 
@@ -42,7 +43,7 @@ delete forced: rm -rf ~/.open-webui  # ⚠️ WARNING: This resets Open WebUI's 
 
 curl -X 'POST' 'http://localhost:8000/ask' -H 'Content-Type: application/json' -d '{"query": "How do I configure Device X for LTE?"}'
 
-#High Level Application design:
+**High Level Application design**
 ```
                           +------------------------+
                           |   Query UI (Streamlit) |
@@ -84,11 +85,25 @@ curl -X 'POST' 'http://localhost:8000/ask' -H 'Content-Type: application/json' -
 ```
 
 
-#Technology Stack
+**Technology Stack**
 
-#ToDo
+| Component              | Technology Used                   | Purpose                                         |
+|------------------------|----------------------------------|-------------------------------------------------|
+| **Backend Framework**  | FastAPI                          | Exposes an API for querying documents          |
+| **Message Queue**      | Apache Kafka                     | Handles real-time document ingestion           |
+| **Vector Database**    | Qdrant                           | Stores document embeddings                     |
+| **Embeddings Model**   | Ollama (Mistral)                 | Generates text embeddings                      |
+| **Dimensionality Reduction** | PCA (Scikit-learn)         | Reduces vector size (4096 → 512)               |
+| **Document Processing** | pdfminer, docx, pandas, pytesseract | Extracts text from different document formats |
+| **Frontend**           | Streamlit                        | Provides an interactive UI for document queries |
+| **Logging & Monitoring** | Logging (Python)               | Logs system errors and processing status       |
+| **Data Serialization** | JSON (Kafka Messages)            | Sends document metadata and queries            |
+| **Database Access**    | Qdrant Client (Python)           | Inserts & retrieves document embeddings        |
 
-#Reorganized Folder Structure
+
+
+
+**Reorganized Folder Structure**
 ```
 /ai-document-search
 │── /backend
