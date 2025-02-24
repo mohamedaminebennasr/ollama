@@ -1,5 +1,5 @@
 
-#This repository has 3 files:
+#This repository has 3 files to describe the AI-Powered Documentation Query system:
 
 #1- app.py: Backend using FastAPI
 
