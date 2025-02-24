@@ -7,15 +7,11 @@ This repository has 3 files to describe the AI-Powered Documentation Query syste
 
 3- query_ui.py: Frontend using streamlit. The UI created will be used to send the command to the backend
 
-#Note: Why installing ollama package in python and also ollama natively using curl -fsSL https://ollama.com/install.sh | sh?
+Note: Why installing ollama package in python and also ollama natively using curl -fsSL https://ollama.com/install.sh | sh?
 
-#The Python package ollama (which you already have in requirements.txt) only provides a client to communicate with the Ollama runtime.
+The Python package ollama (which you already have in requirements.txt) only provides a client to communicate with the Ollama runtime. The actual Ollama engine (native one) needs to be installed separately to run models like deepseek-r1. Without installing the Ollama runtime, your application won't be able to load or run DeepSeek models.
 
-#The actual Ollama engine (native one) needs to be installed separately to run models like deepseek-r1.
-
-#Without installing the Ollama runtime, your application won't be able to load or run DeepSeek models.
-
-#create separate python venv
+create separate python venv
 
 python3 -m venv myenv
 
