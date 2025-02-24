@@ -127,7 +127,7 @@ curl -X 'POST' 'http://localhost:8000/ask' -H 'Content-Type: application/json' -
 bin/zookeeper-server-start.sh config/zookeeper.properties &
 bin/kafka-server-start.sh config/server.properties &
 
-#start qdrant
+#Install and Start qdrant
 
 sudo docker run -d --name qdrant -p 6333:6333 qdrant/qdrant
 
