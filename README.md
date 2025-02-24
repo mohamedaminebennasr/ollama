@@ -46,34 +46,34 @@ rm -rf ~/.open-webui  # ⚠️ WARNING: This resets Open WebUI's settings!
 curl -X 'POST' 'http://localhost:8000/ask' -H 'Content-Type: application/json' -d '{"query": "How do I configure Device X for LTE?"}'
 
 #High Level Application design:
-
+```
                           +------------------------+
                           |   Query UI (Streamlit) |
                           +------------+-----------+
                                        |
                                        ▼
-                          +----------------------+
-                          |    Query API (FastAPI) |
+                          +----------------------------+
+                          |    Query API (FastAPI)     |
                           |  - Generates query vectors |
-                          |  - Queries Qdrant |
-                          +------------+-------------+
+                          |  - Queries Qdrant          |
+                          +------------+---------------+
                                        |
           +----------------------------+-----------------------------+
           |                                                            |
           ▼                                                            ▼
-+----------------------------+                        +----------------------------+
++----------------------------+                        +-----------------------------+
 |   Qdrant Vector DB         |                        |   Kafka Event Bus           |
 |  - Stores document vectors |                        |  - Decouples ingestion      |
 |  - Supports semantic search|                        |  - Ensures real-time updates|
-+----------------------------+                        +----------------------------+
++----------------------------+                        +-----------------------------+
           ▲                                                            ▲
           |                                                            |
           |                                                            |
-+----------------------------+                        +----------------------------+
++----------------------------+                        +-----------------------------+
 |   Document Processor       |                        |  Producer (Document Feeder) |
 |  - Extracts & chunks text  |                        |  - Reads & sends files      |
 |  - Generates embeddings    |                        |  - Publishes to Kafka       |
-|  - Deduplicates documents  |                        +----------------------------+
+|  - Deduplicates documents  |                        +-----------------------------+
 |  - Indexes in Qdrant       |
 +------------+---------------+
              |
@@ -84,10 +84,15 @@ curl -X 'POST' 'http://localhost:8000/ask' -H 'Content-Type: application/json' -
 |  - Extracts & embeds text  |
 |  - Stores in Qdrant        |
 +----------------------------+
+```
+
 
 #Technology Stack
-ToDo
+
+#ToDo
+
 #Reorganized Folder Structure
+```
 /ai-document-search
 │── /backend
 │   ├── api.py                # FastAPI endpoints
@@ -110,7 +115,7 @@ ToDo
 │── requirements.txt
 │── Dockerfile                 # Docker setup
 │── README.md
-
+```
 
 
 #To start the application after installing the dependencies from the requirements.txt
@@ -132,10 +137,7 @@ python process_docs.py
 
 streamlit run query_ui.py
 
-#You can launch your UI using Streamlit (`query_ui.py`). From this interface, you can send requests to the backend (`app.py`), which will then trigger the Ollama chat using the DeepSeek-R1 model.
-#Reset Kafka Consumer Offsets
-#kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-group --reset-offsets --to-earliest --execute --all-topics
-
+#Note: You can launch your UI using Streamlit (`query_ui.py`). From this interface, you can send requests to the backend (`app.py`), which will then trigger the Ollama chat using the DeepSeek-R1 model.
 
 -------------------------------------------------------------------------------------------------------------------------------------
 #Potential Enhancement
