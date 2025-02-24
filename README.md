@@ -13,11 +13,6 @@
 #The actual Ollama engine (native one) needs to be installed separately to run models like deepseek-r1.
 #Without installing the Ollama runtime, your application won't be able to load or run DeepSeek models.
 
-sudo apt update
-sudo apt update && sudo apt install -y tesseract-ocr
-
-sudo apt install python3 python3-venv python3-pip -y
-
 #create separate python venv
 
 python3 -m venv myenv
@@ -30,26 +25,21 @@ curl -fsSL https://ollama.com/install.sh | sh
 
 #Install open-webui docker
 
+sudo docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+
 docker stop open-webui
 
 docker rm open-webui
 
 rm -rf ~/.open-webui  # ⚠️ WARNING: This resets Open WebUI's settings!
 
-sudo docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
-
 #Note: you need to point to ollama 127.0.0.1:11434 in open-webui (open Settings->...)
 
 #Intall this package to be able to implement your python script
 
-#pip install ollama langchain chromadb pdfminer.six fastapi uvicorn sentence-transformers
-
-pip install streamlit
 #pip install -r requirements.txt
 
 #Install deepseek-r1 by using the UI open-webui or vi CLI: ollama pull deepseek-r1 and in this case you don't need open-webui
-
-
 
 #Test via CLI using:
 
