@@ -7,7 +7,7 @@ This repository has 3 files to describe the AI-Powered Documentation Query syste
 
 3- query_ui.py: Frontend using streamlit. The UI created will be used to send the command to the backend
 
-Note: Why installing ollama package in python and also ollama natively using curl -fsSL https://ollama.com/install.sh | sh?
+**Note:** Why installing ollama package in python and also ollama natively using curl -fsSL https://ollama.com/install.sh | sh?
 
 The Python package ollama (which you already have in requirements.txt) only provides a client to communicate with the Ollama runtime. The actual Ollama engine (native one) needs to be installed separately to run models like deepseek-r1. Without installing the Ollama runtime, your application won't be able to load or run DeepSeek models.
 
@@ -17,7 +17,7 @@ python3 -m venv myenv
 
 source myenv/bin/activate
 
-#Install native ollama
+Install native ollama
 
 curl -fsSL https://ollama.com/install.sh | sh
 
@@ -25,11 +25,10 @@ curl -fsSL https://ollama.com/install.sh | sh
 
 sudo docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 
-docker stop open-webui
-
-docker rm open-webui
-
-rm -rf ~/.open-webui  # ⚠️ WARNING: This resets Open WebUI's settings!
+**Note:** Below commands are optional:
+stop: docker stop open-webui
+delete: docker rm open-webui
+delete forced: rm -rf ~/.open-webui  # ⚠️ WARNING: This resets Open WebUI's settings!
 
 #Note: you need to point to ollama 127.0.0.1:11434 in open-webui (open Settings->...)
 
