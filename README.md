@@ -10,7 +10,9 @@
 #Note: Why installing ollama package in python and also ollama natively using curl -fsSL https://ollama.com/install.sh | sh?
 
 #The Python package ollama (which you already have in requirements.txt) only provides a client to communicate with the Ollama runtime.
+
 #The actual Ollama engine (native one) needs to be installed separately to run models like deepseek-r1.
+
 #Without installing the Ollama runtime, your application won't be able to load or run DeepSeek models.
 
 #create separate python venv
@@ -119,20 +121,26 @@ curl -X 'POST' 'http://localhost:8000/ask' -H 'Content-Type: application/json' -
 
 
 #To start the application after installing the dependencies from the requirements.txt
+
 #start kafka: should start zookeeper then kafka as per this order
+
 bin/zookeeper-server-start.sh config/zookeeper.properties &
 bin/kafka-server-start.sh config/server.properties &
+
 #start qdrant
+
 sudo docker run -d --name qdrant -p 6333:6333 qdrant/qdrant
 
 #To start your backend app.py
+
 uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
 #Use uvicorn app:app --reload after any modification of app.py if needed.
 
 #Run the script to index documents:
 
-python process_docs.py
+#python process_docs.py
+
 #To have a UI from where you will ask your model
 
 streamlit run query_ui.py
